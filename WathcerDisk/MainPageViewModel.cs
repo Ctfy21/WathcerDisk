@@ -50,7 +50,7 @@ namespace WathcerDisk
                 }
                 catch
                 {
-                    MessageBox.Show("Ошибка с подключением к интернету");
+                    MessageBox.Show("Ошибка с подключением к интернету!");
                 }
                 ObservableCollection<Data> TempDataColl = new ObservableCollection<Data>();
                 for (int i = 0; i < 31; i++)
