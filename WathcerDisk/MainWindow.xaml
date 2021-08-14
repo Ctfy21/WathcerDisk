@@ -1,0 +1,19 @@
+﻿<Window x:Class="WathcerDisk.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WathcerDisk"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="810" WindowStartupLocation="CenterScreen">
+    <StackPanel Orientation="Horizontal">
+        <ListBox ItemsSource="{Binding Datas}" Width="650">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Path=Work}" Foreground="Black" FontSize="14"/>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+        <Button Height="30" Width="122" VerticalAlignment="Top" Content="Update" Margin="10,40,10,10" HorizontalAlignment="Right" Command="{Binding Path = MyCommand}"/>
+    </StackPanel>
+</Window>
