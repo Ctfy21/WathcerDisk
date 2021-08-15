@@ -17,11 +17,14 @@ using FireSharp.Config;
 using System.Threading;
 using System.IO;
 using GalaSoft.MvvmLight.CommandWpf;
+using Microsoft.Win32;
+using WinForms = System.Windows.Forms;
 
 namespace WathcerDisk
 {
     class MainPageViewModel : INotifyPropertyChanged
     {
+        Thread loggerThread;
         Logger logger;
         IFirebaseConfig config = new FirebaseConfig()
         {
@@ -32,17 +35,32 @@ namespace WathcerDisk
 
 
         public MainPageViewModel()
-        {     
+        {
+            StartProgram();
+        }
+
+        [STAThread]
+        public void StartProgram()
+        {
             logger = new Logger();
-            Thread loggerThread = new Thread(new ThreadStart(logger.Start));
+            loggerThread = new Thread(new ThreadStart(logger.Start));
             loggerThread.Start();
             Task.Run(() => TrySelect());
         }
 
- 
+        [STAThread]
+        public void TryChange()
+        {
+            logger.Stop();
+            loggerThread.Abort();
+            File.WriteAllText("path.txt", "");
+            logger = new Logger();
+            loggerThread = new Thread(new ThreadStart(logger.Start));
+            loggerThread.Start();
+        }
 
 
-       public void TrySelect()
+        public void TrySelect()
        {
                 try
                 {
@@ -83,6 +101,7 @@ namespace WathcerDisk
 
         class Logger
         {
+            string path;
             IFirebaseConfig config = new FirebaseConfig()
             {
                 AuthSecret = "JuN06Hm78gQ5sMRoNPjUDHOiprp7B3Jq1GVxYY2h",
@@ -94,7 +113,27 @@ namespace WathcerDisk
             bool enabled = true;
             public Logger()
             {
-                watcher = new FileSystemWatcher("C:\\Users\\User\\Downloads");
+
+                try
+                {
+                   string Temp = File.ReadAllText("path.txt");
+                   if(File.ReadAllText("path.txt") == "")
+                   {
+                       throw new Exception("gg");
+                   }
+                   watcher = new FileSystemWatcher(Temp);
+                }
+                catch
+                {
+                    WinForms.FolderBrowserDialog fbd = new WinForms.FolderBrowserDialog();
+                    fbd.ShowDialog();
+                    path = fbd.SelectedPath;
+                    File.WriteAllText("path.txt", path);
+                    watcher = new FileSystemWatcher(path);
+                    client = new FireSharp.FirebaseClient(config);
+                    var r = client.DeleteAsync("DatasList/");
+                    File.WriteAllText("save.txt", 0.ToString());
+                }
                 watcher.Deleted += Watcher_Deleted;
                 watcher.Created += Watcher_Created;
                 watcher.Changed += Watcher_Changed;
@@ -106,7 +145,7 @@ namespace WathcerDisk
                 watcher.EnableRaisingEvents = true;
                 while (enabled)
                 {
-                    Thread.Sleep(1000);
+                    Thread.Sleep(200);
                 }
             }
             public void Stop()
@@ -187,10 +226,25 @@ namespace WathcerDisk
                 return _myCommand;
             }
         }
+        private ICommand _myCommandchange;
+        public ICommand MyCommandChange
+        {
+            get
+            {
+                if (_myCommandchange == null)
+                { _myCommandchange = new RelayCommand<object>(this.MyCommand_ExecuteChange); }
+                return _myCommandchange;
+            }
+        }
 
         private async void MyCommand_Execute(object parameter)
         {
             await Task.Run(() => TrySelect());
+        }
+
+        private async void MyCommand_ExecuteChange(object parameter)
+        {
+            await Task.Run(() => TryChange());
         }
 
         /// <summary>

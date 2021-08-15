@@ -14,6 +14,9 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
+        <StackPanel>
         <Button Height="30" Width="122" VerticalAlignment="Top" Content="Update" Margin="10,40,10,10" HorizontalAlignment="Right" Command="{Binding Path = MyCommand}"/>
+        <Button Height="30" Width="122" VerticalAlignment="Top" Content="Change path" Margin="10,25,10,10" HorizontalAlignment="Right" Command="{Binding Path = MyCommandChange}"/>
+        </StackPanel>
     </StackPanel>
 </Window>
