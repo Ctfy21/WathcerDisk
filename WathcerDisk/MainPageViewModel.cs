@@ -54,9 +54,8 @@ namespace WathcerDisk
             logger.Stop();
             loggerThread.Abort();
             File.WriteAllText("path.txt", "");
-            logger = new Logger();
-            loggerThread = new Thread(new ThreadStart(logger.Start));
-            loggerThread.Start();
+            System.Windows.Forms.Application.Restart();
+            System.Environment.Exit(1);
         }
 
 
